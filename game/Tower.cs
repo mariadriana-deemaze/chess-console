@@ -1,7 +1,6 @@
-﻿using chess_console.board;
+﻿using board;
 
-namespace chess_console.pieces
-{
+namespace game {
     internal class Tower : Piece
     {
 

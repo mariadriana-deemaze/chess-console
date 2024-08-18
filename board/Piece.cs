@@ -1,7 +1,4 @@
-﻿using System;
-
-namespace chess_console.board
-{
+﻿namespace board {
     class Piece
     {
         public Position position {  get; set; }
@@ -15,6 +12,10 @@ namespace chess_console.board
             this.board = board; 
             this.color = color;
             this.moves = 0;
+        }
+
+        public void incrementMovement() {
+            moves++; 
         }
     }
 }

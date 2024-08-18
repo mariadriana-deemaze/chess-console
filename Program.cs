@@ -1,20 +1,20 @@
-﻿using chess_console.board;
-using chess_console.pieces;
+﻿using game;
 
-namespace chess_console
-{
+namespace chess_console {
     class Program
     {
         static void Main()
         {
-            Board board = new Board(8, 8);
+            try { 
+                Game game = new Game();
+                Print.printBoard(game.board);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
-            board.putPiece(new Tower(board,Color.Black), new Position(0, 0));
-            board.putPiece(new Tower(board, Color.Black), new Position(1, 3));
-            board.putPiece(new Tower(board, Color.Black), new Position(2, 4));
-
-            Print.printBoard(board);
-
+            
             Console.ReadLine();
         }
     }
