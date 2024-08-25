@@ -8,6 +8,7 @@ namespace game {
         public bool finished { get; private set; }
         private HashSet<Piece> pieces;
         private HashSet<Piece> capturedPieces;
+        public bool inCheck { get; private set; }
 
         public Game()
         {
@@ -16,13 +17,32 @@ namespace game {
             player = Color.White;
             pieces = new HashSet<Piece>();
             capturedPieces = new HashSet<Piece>();
+            inCheck = false;
             Init();
         }
 
         public void PlayTurn(Position origin, Position target) {
-            Move(origin, target);
-            turn++;
-            ChangePlayer();
+            Piece captured = Move(origin, target);
+            
+            if (IsInCheck(player)) {
+                UndoMove(origin, target, captured);
+                throw new BoardException("Cannot put yourself in check.");
+            }
+
+            if (IsInCheck(GetAdversaryPlayer(player))) {
+                inCheck = true;
+            } else {
+                inCheck = false;
+            }
+
+            if (ValidateCheck(GetAdversaryPlayer(player))) {
+                finished = true;
+            } else { 
+                turn++;
+                ChangePlayer();
+            }
+           
+
         }
 
         public void ChangePlayer() {
@@ -33,7 +53,7 @@ namespace game {
             }
         }
         
-        public void Move(Position origin, Position target) {
+        public Piece Move(Position origin, Position target) {
             Piece piece = board.RemovePiece(origin);
             piece.IncrementMovement();
             Piece capturedPiece = board.RemovePiece(target);
@@ -41,6 +61,17 @@ namespace game {
             if(capturedPiece != null) {
                 capturedPieces.Add(capturedPiece);
             }
+            return piece;
+        }
+
+        public void UndoMove(Position origin, Position target, Piece captured) {
+            Piece piece = board.RemovePiece(target);
+            piece.DecrementMovement();
+            if (captured != null) {
+                board.PutPiece(captured, target);
+                capturedPieces.Remove(captured);
+            }
+            board.PutPiece(piece, origin);
         }
 
         public void ValidateOriginPosition(Position origin){
@@ -91,6 +122,69 @@ namespace game {
             }
             filtered.ExceptWith(CapturedPieces(color));
             return filtered;
+        }
+
+        private Color GetAdversaryPlayer(Color color)
+        {
+            if(color == Color.White) {
+                return Color.Black;
+            } else {
+                return Color.White;
+            }
+        }
+
+        private Piece? GetKing(Color color)
+        {
+            foreach (Piece piece in InGamePieces(color))
+            {
+                if(piece is King)
+                {
+                    return piece;
+                }
+            }
+            return null;
+        }
+
+        public bool IsInCheck(Color color)
+        {
+            Piece? king = GetKing(color) ?? throw new BoardException("Theres no King on the " +  color + " in board.");
+            
+            foreach (Piece piece in InGamePieces(GetAdversaryPlayer(color))) {
+                bool[,] mat = piece.PossibleMoves();
+                if (mat[king.position.row, king.position.column]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        public bool ValidateCheck(Color color)
+        {
+            if (!IsInCheck(color))
+            {
+                return false;
+            }
+
+            foreach (Piece piece in InGamePieces(color)) {
+                bool[,] mat = piece.PossibleMoves();
+                for(int i = 0; i < board.rows; i++) {
+                    for (int j = 0; j < board.columns; j++) { 
+                        if(mat[i, j])
+                        {
+                            Position origin = piece.position;
+                            Position target = new Position(i, j);
+                            Piece captured = Move(origin, target);
+                            bool check = IsInCheck(color);
+                            UndoMove(origin, target, captured);
+                            if (!check) { 
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
         }
 
         private void Init()

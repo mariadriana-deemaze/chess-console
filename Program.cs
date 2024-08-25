@@ -14,10 +14,7 @@ namespace chess_console {
 
                     try {
                         Console.Clear();
-                        Print.printBoard(game.board);
-                        Console.WriteLine();
-                        Console.WriteLine("Turn: " + game.turn);
-                        Console.WriteLine(game.player + "'s turn.");
+                        Print.PrintTurn(game);
 
                         Console.Write("Type origin position: ");
                         Position origin = Print.ReadPosition().ToPosicion();
@@ -27,7 +24,7 @@ namespace chess_console {
                         bool[,] possibleMoves = game.board.Piece(origin).PossibleMoves();
 
                         Console.Clear();
-                        Print.printBoard(game.board, possibleMoves);
+                        Print.PrintBoard(game.board, possibleMoves);
                         Console.WriteLine();
 
                         Console.Write("Type target position: ");
@@ -42,6 +39,9 @@ namespace chess_console {
                     }
                    
                 }
+
+                Console.Clear();
+                Print.PrintTurn(game);
 
             }
             catch (BoardException ex)

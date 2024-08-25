@@ -31,6 +31,11 @@
             moves++; 
         }
 
+        public void DecrementMovement()
+        {
+            moves--;
+        }
+
         public bool CanMoveTo(Position pos) {
             return PossibleMoves()[pos.row, pos.column];
         }

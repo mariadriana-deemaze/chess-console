@@ -1,16 +1,38 @@
 ﻿using board;
 using game;
+using System;
+using System.Drawing;
 
 namespace chess_console {
     internal class Print
     {
 
-        public static void printBoard(Board board) {
+        public static void PrintTurn(Game game) {
+            PrintBoard(game.board);
+            Console.WriteLine();
+            PrintCapturedPieces(game);
+            Console.WriteLine();
+            Console.WriteLine("Turn: " + game.turn);
+
+            if (!game.finished) { 
+                Console.WriteLine(game.player + "'s turn.");
+                if (game.inCheck) {
+                    Console.WriteLine("IN CHECK!");
+                }
+            } else
+            {
+                Console.WriteLine("Checkmate.");
+                Console.WriteLine("Winner: " + game.player);
+            }
+
+        }
+
+        public static void PrintBoard(Board board) {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             for (int i = 0; i < board.rows; i++) {
                 Console.Write(8 - i + " ");
                 for (int j = 0; j < board.columns; j++) {
-                    printPiece(board.Piece(i, j)); 
+                    PrintPiece(board.Piece(i, j)); 
                 }
                 Console.WriteLine();
             }
@@ -18,7 +40,7 @@ namespace chess_console {
             Console.WriteLine();
         }
 
-        public static void printBoard(Board board, bool[,] possibleMoves)
+        public static void PrintBoard(Board board, bool[,] possibleMoves)
         {
             ConsoleColor originalBackground = Console.BackgroundColor;
             ConsoleColor alternateBackground = ConsoleColor.DarkGray;
@@ -31,7 +53,7 @@ namespace chess_console {
                     } else {
                         Console.BackgroundColor = originalBackground;
                     }
-                    printPiece(board.Piece(i, j));
+                    PrintPiece(board.Piece(i, j));
                 }
                 Console.WriteLine();
             }
@@ -41,7 +63,7 @@ namespace chess_console {
         }
 
         
-        public static void printPiece(Piece piece) {
+        public static void PrintPiece(Piece piece) {
 
             if(piece == null)
             {
@@ -49,7 +71,7 @@ namespace chess_console {
             }
             else
             {
-                if(piece.color == Color.White) {
+                if(piece.color == board.Color.White) {
                     Console.Write(piece);
                 } else {
                     ConsoleColor aux = Console.ForegroundColor;
@@ -59,6 +81,31 @@ namespace chess_console {
                 }
                 Console.Write(" ");
             }
+        }
+
+        public static void PrintCapturedPieces(Game game) {
+            Console.WriteLine(string.Concat(Enumerable.Repeat("# ", game.board.columns + 1)));
+            Console.WriteLine();
+            Console.WriteLine("Captured pieces");
+            Console.Write("White's: ");
+            PrintGroup(game.CapturedPieces(board.Color.White));
+            ConsoleColor aux = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(); 
+            Console.Write("Black's: ");
+            PrintGroup(game.CapturedPieces(board.Color.Black));
+            Console.ForegroundColor = aux;
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(string.Concat(Enumerable.Repeat("- ", game.board.columns + 1)));
+        }
+
+        public static void PrintGroup(HashSet<Piece> group) {
+            Console.Write("[");
+            foreach (Piece piece in group) {
+                Console.Write(piece + " ");
+            }
+            Console.Write("]  ");
         }
 
         public static ChessPosition ReadPosition() {
