@@ -2,7 +2,7 @@
     class Board {
         public int rows {  get; set; }
         public int columns { get; set; }
-        private Piece[,] pieces;
+        public Piece[,] pieces;
 
         public Board(int rows, int columns)
         {
@@ -11,29 +11,35 @@
             pieces = new Piece[rows, columns];
         }
 
-        public Piece piece(Position position)
+
+        public Piece Piece(int row, int column)
         {
-            return pieces[position.row, position.column];
+            return pieces[row, column];
         }
 
-        public void putPiece(Piece piece, Position position)
+        public Piece Piece(Position pos)
         {
-            if (exists(position))
+            return pieces[pos.row, pos.column];
+        }
+
+        public void PutPiece(Piece p, Position pos)
+        {
+            if (Exists(pos))
             {
                 throw new BoardException("There's already a piece in that position.");
             }
-            pieces[position.row, position.column] = piece;
-            piece.position = position;
+            pieces[pos.row, pos.column] = p;
+            p.position = pos;
         }
 
 
-        public bool exists(Position position) { 
-            validatePosition(position);
-            return piece(position) != null; 
+        public bool Exists(Position position) { 
+            ValidatePosition(position);
+            return Piece(position) != null; 
         }
 
        
-        public bool evalPositionValidity(Position position)
+        public bool EvalPositionValidity(Position position)
         {
             if(position.row < 0 || position.row >= rows || position.column < 0 || position.column >= columns)
             {
@@ -42,22 +48,20 @@
             return true;
         }
 
-        public void validatePosition(Position position)
+        public void ValidatePosition(Position position)
         {
-            if(!evalPositionValidity(position))
+            if(!EvalPositionValidity(position))
             {
                 throw new BoardException("Invalid position.");
             }
         }
 
-         public Piece removePiece(Position position)
+         public Piece RemovePiece(Position position)
         {
-            if(piece(position) != null)
-            {
+            if(Piece(position) == null) {
                 return null;
             }
-
-            Piece aux = piece(position);
+            Piece aux = Piece(position);
             aux.position = null;
             pieces[position.row, position.column] = null;
             return aux;

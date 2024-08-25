@@ -1,5 +1,5 @@
 ﻿namespace board {
-    class Piece
+    abstract class Piece
     {
         public Position position {  get; set; }
         public Color color { get; protected set; }
@@ -14,8 +14,27 @@
             this.moves = 0;
         }
 
-        public void incrementMovement() {
+        public bool HasPossibleMoves() {
+            bool[,] mat = PossibleMoves();
+            for (int i = 0; i < board.rows; i++) {
+                for (int j = 0; j < board.columns; j++) {
+                    if (mat[1, j])
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void IncrementMovement() {
             moves++; 
         }
+
+        public bool CanMoveTo(Position pos) {
+            return PossibleMoves()[pos.row, pos.column];
+        }
+
+        public abstract bool[,] PossibleMoves();
     }
 }
