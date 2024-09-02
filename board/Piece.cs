@@ -18,7 +18,7 @@
             bool[,] mat = PossibleMoves();
             for (int i = 0; i < board.rows; i++) {
                 for (int j = 0; j < board.columns; j++) {
-                    if (mat[1, j])
+                    if (mat[i, j])
                     {
                         return true;
                     }
